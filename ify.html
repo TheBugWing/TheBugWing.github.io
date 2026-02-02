@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>ejan!!</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <style>
+            *{margin:0;padding:0;}
+            
+            body{
+             background-color:#c6bade;
+            }
+            
+            #main{
+              margin-top:5vh;
+              display:flex;
+              justify-content:center;
+              flex-direction:column;
+            }
+            
+            #ta,#ta1,#ta2{
+              outline:none;
+              border:none;
+              width:70%;
+              padding:15px;
+              align-items:center;
+              margin:10px auto 5px;
+            }
+            
+            #go{
+              padding:10px;
+              border:none;
+              outline:none;
+              width:50%;
+              margin:10px auto 15px;
+              background-color:#301a4b;
+              color:white;
+             
+            }
+        </style>
+    </head>
+    <body>
+        <div id="main">
+        <textarea id="ta" placeholder="image source url">img2.png</textarea>
+        <textarea id="ta1" placeholder="image dest url">img.png</textarea>
+        <textarea id="ta2" placeholder="image mask url">imgm.png</textarea>
+        <button id="go">Goooo!</button>
+        </div>
+    </body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.10.0/p5.min.js"></script>
+    <script>
+    let img=null;
+            let img2=null;
+            let arrb=[];
+            let arrb2=[];
+            let img2o=[];
+            let arridx=[];
+            let arridxt=[]
+            let t=-3;;
+            let iurl=""
+            let curl="gg.png";
+            let gp=null;
+            let loaded=false;
+            let il=20;;
+            let cil=0;
+        let imgn=null;
+        let img2n=null;
+        let imgm=null;
+        let imgmn=null;
+        let faill=false;
+        let btn=document.querySelector("#go");
+        let ta=document.querySelector("#ta");
+        let ta1=document.querySelector("#ta1");
+        let ta2=document.querySelector("#ta2");
+        let tr=0;
+        let res=1
+        let att=1.8891;
+        let td=16;
+        let tbd=16;
+        const WW=600||innerWidth;
+            const HH=WW;
+            const W=WW/res;
+            const H=W;
+        let idxr=[];
+        let ft=true;
+        let fetching=false;
+            
+            
+        let vc=41+Math.floor(Math.random()*50);
+        let vca=[];
+        let vcg=[];
+        function fillvca(){
+            for(let i=0;i<vc;i++){
+               let x=Math.random()*W;
+               let y=Math.random()*H;
+               x=Math.floor(x);
+               y=Math.floor(y);
+               vca.push([x,y]);
+               vcg.push([]);
+            }
+        }
+       
+        function dd(a,b){
+           let x=a[0]-b[0];
+           let y=a[1]-b[1];
+           return Math.sqrt(x*x+y*y);
+        }
+        
+        function dd2(a,b){
+           let x=a[0]-b[0];
+           let y=a[1]-b[1];
+           let k=4;
+           let d = Math.pow(Math.pow(Math.abs(x),k) + Math.pow(Math.abs(y),k),(1/k))
+           return d;
+        }
+        
+        function dd3(a,b){
+           let x=a[0]-b[0];
+           let y=a[1]-b[1];
+           let k=4;
+           //let d = Math.pow(Math.pow(Math.abs(x),k) + Math.pow(Math.abs(y),k),(1/k))
+           let sx=3;
+           let sy=3;
+           let theta=Math.random()*Math.PI
+           
+
+// rotate by random angle
+          let dx2 = x*Math.cos(theta) + y*Math.sin(theta)
+let dy2 = -x*Math.sin(theta) + y*Math.cos(theta)
+
+// scale
+dx2 /= sx    // stretch x
+dy2 /= sy    // stretch y
+
+let d = Math.sqrt(dx2*dx2 + dy2*dy2)
+           return d;
+        }
+        function genv(){
+           for(let i=0;i<H;i++){
+              for(let j=0;j<W;j++){
+                 let cmin=100000000;
+                 let cxy=[-1,-1];
+                 let ki=-1;
+                 let kl=[]
+                 for(let k=0;k<vca.length;k++){
+                    let d=dd(vca[k],[j,i]);
+                    kl.push([d,k])
+                    if(d<cmin){
+                      cxy=vca[k]
+                      cmin=d;
+                      ki=k;
+                   
+                    }
+                 }
+                 kl.sort((a,b)=>a[0]-b[0])
+                 if(i==0&&j==0)console.log(kl);
+                 let rr=Math.random()*2;
+                 let r=Math.floor(rr)
+               //  r=1
+                if(i==0&&j==0) console.log(rr)
+                 ki=kl[r][1]
+                 vcg[ki].push([j,i]);
+              }
+           }
+        
+        }
+        
+        function genv2(){
+           for(let i=0;i<H;i++){
+              for(let j=0;j<W;j++){
+                 let cmin=100000000;
+                 let cmin2=100000000;
+                 let cmin3=100000000;
+               
+                 let ki=-1;
+                 let ki2=-1;
+                 let ki3=-1;
+                 for(let k=0;k<vca.length;k++){
+                    let d=dd(vca[k],[j,i]);
+                  
+                    if(d<cmin){
+                      cmin3=cmin2;
+                      cmin2=cmin
+                      cmin=d;
+                      ki3=ki2;
+                      ki2=ki
+                      ki=k;
+                    }else if(d<cmin2){
+                      cmin3=cmin2;
+                      cmin2=d;
+                      ki3=ki2;
+                      ki2=k
+                    }else if(d<cmin3){
+                      cmin3=d
+                      ki3=k
+                    }
+                 }
+                 let r=Math.random()*0.5>?ki:ki2;
+                 vcg[r].push([j,i]);
+              }
+           }
+        
+        }
+        
+        function randidx(){
+          for(let i=0;i<idxr.length;i++){
+            let j=Math.floor(Math.random()*idxr.length);
+            let x=idxr[i][0]
+            let y=idxr[i][1]
+            idxr[i][0]=idxr[j][0]
+            idxr[i][1]=idxr[j][1]
+            idxr[j][0]=x
+            idxr[j][1]=y
+          }
+        }
+        function corev(p,vi,img2o,img,img2,imgm,arrb,arrb2,arridx,arridxt){
+        img.loadPixels();
+                imgm.loadPixels();
+                img2.loadPixels();
+                
+                for (let ci=0;ci<vcg[vi].length;++ci){
+                     let j=vcg[vi][ci][0];
+                     let i=vcg[vi][ci][1];
+                        let idx=j+i*(W);
+                        idx*=4;
+                        let r2=img2.pixels[idx+0];
+                        let g2=img2.pixels[idx+1];
+                        let b2=img2.pixels[idx+2];
+                        img2o[idx+0]=r2
+                        img2o[idx+1]=g2
+                        img2o[idx+2]=b2
+                        img2o[idx+3]=img2.pixels[idx+3];
+                        if(imgm.pixels[idx]<tr)continue;
+
+                        let r=img.pixels[idx+0];
+                        let g=img.pixels[idx+1];
+                        let b=img.pixels[idx+2];
+                        
+                        let c = p.color(r, g, b); 
+      
+          
+                        p.colorMode(p.HSB, 360, 100, 100, 100);
+
+                        let br = p.brightness(c);
+
+                        arrb.push([br,j,i])
+                     
+                        
+                        
+                        
+                        let c2 = p.color(r2, g2, b2); 
+      
+          
+                        p.colorMode(p.HSB, 360, 100, 100, 100);
+                        let br2 = p.brightness(c2);
+                        
+                        arrb2.push([br2,j,i]);
+      
+                        p.colorMode(p.RGB, 255, 255, 255, 255);
+
+                    
+                }
+                arrb=arrb.sort(function(a,b){
+                     return a[0]-b[0];
+                });
+                arrb2=arrb2.sort(function(a,b){
+                     return a[0]-b[0];
+                });
+
+                img.updatePixels();
+                
+                for(let i=0;i<arrb.length;++i){
+                   let xs=arrb[i][1];
+                   let ys=arrb[i][2];
+                   let xd=arrb2[i][1];
+                   let yd=arrb2[i][2];
+
+
+                   arridx[xd][yd].push(xs);
+                   arridx[xd][yd].push(ys);
+                   arridxt[xd][yd].push(xd);
+                   arridxt[xd][yd].push(yd);;
+                   
+                }
+          //      console.log(arridx);
+                
+                img2.updatePixels();     
+        }
+        
+        
+        
+        
+        function core(p,sh,sw,img2o,img,img2,imgm,arrb,arrb2,arridx,arridxt){
+        img.loadPixels();
+                imgm.loadPixels();
+                img2.loadPixels();
+                console.log(sh+":"+sh+tbd)
+                console.log(sw+"-"+sw+tbd)
+                for (let i=sh;i<sh+(H/tbd);++i){
+                    for (let j=sw;j<sw+(W/td);++j){
+                        let idx=j+i*(W);
+                        idx*=4;
+                        let r2=img2.pixels[idx+0];
+                        let g2=img2.pixels[idx+1];
+                        let b2=img2.pixels[idx+2];
+                        img2o[idx+0]=r2
+                        img2o[idx+1]=g2
+                        img2o[idx+2]=b2
+                        img2o[idx+3]=img2.pixels[idx+3];
+                        if(imgm.pixels[idx]<tr)continue;
+
+                        let r=img.pixels[idx+0];
+                        let g=img.pixels[idx+1];
+                        let b=img.pixels[idx+2];
+                        
+                        let c = p.color(r, g, b); 
+      
+          
+                        p.colorMode(p.HSB, 360, 100, 100, 100);
+
+                        let br = p.brightness(c);
+                     
+                        arrb.push([br,j,i])
+                     
+                        
+                        
+                        
+                        let c2 = p.color(r2, g2, b2); 
+      
+          
+                        p.colorMode(p.HSB, 360, 100, 100, 100);
+                        let br2 = p.brightness(c2);
+                        
+                        arrb2.push([br2,j,i]);
+      
+                        p.colorMode(p.RGB, 255, 255, 255, 255);
+
+                    }
+                }
+                arrb=arrb.sort(function(a,b){
+                     return a[0]-b[0];
+                });
+                arrb2=arrb2.sort(function(a,b){
+                     return a[0]-b[0];
+                });
+
+                img.updatePixels();
+                
+                for(let i=0;i<arrb.length;++i){
+                   let xs=arrb[i][1];
+                   let ys=arrb[i][2];
+                   let xd=arrb2[i][1];
+                   let yd=arrb2[i][2];
+
+
+                   arridx[xd][yd].push(xs);
+                   arridx[xd][yd].push(ys);
+                   arridxt[xd][yd].push(xd);
+                   arridxt[xd][yd].push(yd);;
+                   
+                }
+          //      console.log(arridx);
+                
+                img2.updatePixels();     
+        }
+        async function loadImg2(gp){
+           let donei=0;
+           gp.loadImage(curl,img=>{
+          img2n=img;
+          console.log("loaded ing2");
+          donei=2;
+          },err=>{
+            alert("failed")
+            img2n=img2
+            donei=1
+          })
+          return new Promise((res,rej)=>{
+             let cl=setInterval(()=>{
+                if(donei==2)res("solved")
+                if(donei==1)rej("failed")
+             },500)
+          })
+        }
+        async function loadImggen(gp,imgu,ind){
+           fetching=true
+           let donei=0;
+           gp.loadImage(imgu,img=>{
+          if(ind==0)img2n=img;
+          else if(ind==1)imgn=img
+          else imgmn=img
+          console.log("loaded ing2");
+          donei=2;
+          },err=>{
+            alert("failed")
+            if(ind==0)img2n=img2
+            else if(ind==1)imgn=img
+            else imgmn=imgm
+            donei=1
+          })
+          return new Promise((res,rej)=>{
+             let cl=setInterval(()=>{
+                if(donei==2)res("solved")
+                if(donei==1)rej("failed")
+             },500)
+          })
+        }
+        async function tryLoad(gp,ta,ta1,ta2){
+           faill=false;
+
+          try{
+          await loadImggen(gp,ta,0);;
+          await loadImggen(gp,ta1,1)
+          await loadImggen(gp,ta2,2)
+          }catch(e){
+              
+             faill=true;
+             loaded=true
+             fetching=false;
+             imgn=img
+             img2n=img2
+             imgmn=imgm
+          }
+        
+           //if(!img)imgn=await gp.loadImage("img.png");
+           
+          // if(!imgm)imgmn=await gp.loadImage("imgm.png")
+          fetching=false;
+           console.log("loaded");
+           return
+        }
+        btn.onclick=async function(e){
+           loaded=false;
+           iurl="";
+           curl=ta.value;
+           
+           await tryLoad(gp,ta.value, ta1.value, ta2.value);
+           img=imgn;
+           img2=img2n;
+           imgm=imgmn;
+           if(!faill){
+           ft=true
+           t=-3;
+           arrb=[];
+           arrb2=[];
+           img2o=[];
+           arridx=[];
+           arridxt=[];
+           cil=0;
+           vca=[];
+           vcg=[];
+           idxr=[];
+           loaded=true;
+           
+           }
+        }
+        const ms = function(p) {
+            gp=p;
+            
+            p.preload=()=>{
+                //img = p.loadImage('img.png')
+           //     img2 = p.loadImage(curl)
+            }
+            
+            p.setup=async ()=>{
+                
+                let cvs=p.createCanvas(WW,HH);
+             //   cvs.center()
+               // p.noSmooth();
+                await tryLoad(gp,ta.value,ta1.value,ta2.value);
+                img=imgn;
+                img2=img2n;
+                imgm=imgmn;
+                loaded=true;
+                console.log("after loaded")
+            }
+            
+            p.draw=()=>{
+               if(!loaded||!img||!img2||!imgm||fetching)return;
+               
+               if(cil<il){cil++;return;}
+
+                if(ft){
+                ft=false;
+                  iurl=curl;
+                for (let i=0;i<W;++i){
+                    img2o.push([])
+                    arridx.push([]);
+                    arridxt.push([]);
+                    for(let j=0;j<H;++j){
+                       img2o[i].push(-1)
+                       arridx[i].push([]);
+                       arridxt[i].push([]);
+                       idxr.push([j,i]);
+                    }
+                }
+              //  randidx();
+                  img.resize(W,H);
+                img2.resize(W,H);
+                imgm.resize(W,H);
+                
+            /*   for(let i=0;i<H;i+=(H/tbd)){
+                   for(let j=0;j<W;j+=(W/td)){
+                      arrb=[]
+                      arrb2=[]
+                      core(p,i,j,img2o,img,img2,imgm,arrb,arrb2,arridx,arridxt);
+                   }
+                }*/
+                fillvca();
+               genv2();
+              for(let i=0;i<vcg.length;++i){
+              arrb=[];
+              arrb2=[];
+              corev(p,i,img2o,img,img2,imgm,arrb,arrb2,arridx,arridxt);
+              }
+}
+let ff=p.deltaTime/1000;
+                
+                p.background(125);
+                img2.loadPixels();
+                imgm.loadPixels();
+                for(let ii=0;ii<img2.height;++ii){
+                   for(let jj=0;jj<img2.width;++jj){
+                      let j=idxr[jj+ii*W][0];
+                      let i=idxr[jj+ii*W][1];
+                      j=jj
+                      i=ii
+                      let idx=(j+i*img2.width)*4;
+                      if(imgm.pixels[idx]<tr)continue;
+
+                      let xs=arridxt[j][i][0];
+                      let ys=arridxt[j][i][1];
+
+                      let xd=arridx[j][i][0];
+                      let yd=arridx[j][i][1];
+                      let dx=xd-xs;
+                      let dy=yd-ys;
+                      let cx=xs;
+                      let cy=ys;
+                      if((dx!=0||dy!=0)&&t>0){
+                      let acx=Math.floor(Math.min(1,(t/90))*dx)
+                      let acy=Math.floor(Math.min(1,(t/90))*dy)
+                      cx=xs+acx;
+                      cy=ys+acy
+
+                     }
+
+                      let cidx=(cx+cy*W)*4;
+                      img2.pixels[cidx+0]=img2o[idx+0];
+                      img2.pixels[cidx+1]=img2o[idx+1];
+                      img2.pixels[cidx+2]=img2o[idx+2];
+                      img2.pixels[cidx+3]=img2o[idx+3];
+                      arridxt[j][i][0]=cx;
+                      arridxt[j][i][1]=cy;
+
+                   }
+
+                }
+                img2.updatePixels();
+                
+
+                p.image(img2,0,0,WW,HH);
+                if(t<=0||Math.random()>=0)t+=(att*ff);
+                else t=t+(att*t/18)*ff
+            }
+        }
+        new p5(ms)
+    </script>
+</html>
